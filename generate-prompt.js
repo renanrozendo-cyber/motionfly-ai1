@@ -3,19 +3,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
-  const { artist, place, date, style, details } = req.body || {};
+  const { artist, place, date, style, details, hasArtistPhoto } = req.body || {};
 
   if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({
-      error: "Configure OPENAI_API_KEY nas variáveis de ambiente da Vercel."
-    });
+    return res.status(500).json({ error: "Configure OPENAI_API_KEY nas variáveis de ambiente da Vercel." });
   }
 
   const systemPrompt = `
-Você é um diretor de arte especialista em flyers para shows, baladas, DJs, artistas, bares e eventos.
+Você é um diretor de arte especialista em flyers comerciais para shows, artistas, DJs, bares, casas noturnas e eventos.
 Crie prompts profissionais para gerar imagens de flyers em IA.
 Sempre mantenha: composição premium, texto legível, hierarquia visual, estética comercial, formato vertical 9:16.
-Responda apenas com o prompt final, sem explicações.
+Se houver foto do artista, instrua a IA a preservar o rosto, pose, identidade, roupa e características principais, criando a arte ao redor da pessoa.
+Responda apenas com o prompt final.
 `;
 
   const userPrompt = `
@@ -25,6 +24,7 @@ Local: ${place || "não informado"}
 Data: ${date || "não informado"}
 Estilo: ${style || "premium"}
 Informações extras: ${details || "nenhuma"}
+Foto do artista enviada: ${hasArtistPhoto ? "sim" : "não"}
 
 O prompt deve pedir uma arte profissional, moderna, vendável, com alta conversão visual.
 `;
@@ -51,11 +51,7 @@ O prompt deve pedir uma arte profissional, moderna, vendável, com alta convers�
       return res.status(response.status).json({ error: data.error?.message || "Erro na OpenAI" });
     }
 
-    const prompt =
-      data.output_text ||
-      data.output?.[0]?.content?.[0]?.text ||
-      "Não foi possível gerar o prompt.";
-
+    const prompt = data.output_text || data.output?.[0]?.content?.[0]?.text || "Não foi possível gerar o prompt.";
     return res.status(200).json({ prompt });
   } catch (error) {
     return res.status(500).json({ error: error.message });

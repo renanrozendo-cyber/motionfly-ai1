@@ -13,7 +13,7 @@ ANIMATION RULES:
 - Preserve original flyer design and identity
 - Motion must feel premium and professional
 - No cartoon effect
-- No distortion of faces or logos
+- No distortion of faces, logos or text
 - No excessive shaking
 - Seamless looping movement preferred
 
@@ -28,17 +28,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
-  const { imageUrl } = req.body || {};
-
-  // Esta rota já prepara o prompt padrão.
-  // Para gerar vídeo de verdade, conecte aqui Runway, Kling, Luma ou PixVerse.
-  // Exemplo de fluxo:
-  // 1. Recebe imageUrl
-  // 2. Envia imageUrl + MOTION_PROMPT para API de vídeo
-  // 3. Retorna videoUrl para o front-end
-
   return res.status(200).json({
     motionPrompt: MOTION_PROMPT,
-    videoStatus: imageUrl ? "Imagem recebida. API de vídeo ainda não conectada." : "Sem imagem. Gere um flyer antes."
+    videoStatus: "Prompt motion pronto. Conecte aqui Runway, Kling, Luma ou PixVerse para gerar vídeo real."
   });
 }
